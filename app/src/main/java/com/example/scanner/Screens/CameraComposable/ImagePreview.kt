@@ -1,0 +1,26 @@
+package com.example.scanner.Screens.CameraComposable
+
+import android.graphics.Bitmap
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asImageBitmap
+
+@Composable
+fun ImagePreview(
+    bitmap: Bitmap
+) {
+
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Image(
+            bitmap = bitmap.asImageBitmap(),
+            "image preview",
+            modifier = Modifier.fillMaxSize()
+        )
+    }
+
+}
