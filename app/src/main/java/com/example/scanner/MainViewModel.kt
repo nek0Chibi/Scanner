@@ -10,10 +10,9 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor() : ViewModel() {
 
-    val bitmap: MutableState<Bitmap?> = mutableStateOf(null)
+    val bitmap = mutableStateOf<Bitmap?>(null)
 
-    fun onPhotoTaken(bitmap: Bitmap) {
-        this.bitmap.value = bitmap
+    fun updateBitmap(newBitmap: Bitmap) {
+        bitmap.value = newBitmap
     }
-
 }

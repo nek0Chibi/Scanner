@@ -1,4 +1,4 @@
-package com.example.scanner.Screens.CameraComposable
+package com.example.scanner.screens.camera_composables
 
 import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView

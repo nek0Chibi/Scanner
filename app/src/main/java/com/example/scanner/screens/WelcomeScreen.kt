@@ -1,4 +1,4 @@
-package com.example.scanner.Screens
+package com.example.scanner.screens
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween

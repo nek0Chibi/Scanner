@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt)
 }
 
 android {
@@ -63,6 +65,8 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.hilt.android)
     implementation(libs.hilt.ext.navigation)
+    ksp(libs.hilt.compiler)
+    ksp(libs.hilt.ext.compiler)
     implementation(libs.mlkit.text.recognition)
     implementation(libs.coil.compose)
     implementation(libs.vision.service)
@@ -74,6 +78,7 @@ dependencies {
     implementation(libs.camerax.extensions)
     implementation(libs.icons.extended)
     implementation(libs.accompanist.permissions)
+
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

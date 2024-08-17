@@ -1,4 +1,4 @@
-package com.example.scanner.Screens.CameraComposable
+package com.example.scanner.screens.camera_composables
 
 import android.graphics.Bitmap
 import android.os.Handler
@@ -86,7 +86,7 @@ fun CameraUI(navController: NavController, viewModel: MainViewModel = hiltViewMo
                 IconButton(
                     onClick = {
                         takePhoto(controller) { newBitmap ->
-                            viewModel.onPhotoTaken(newBitmap)
+                            viewModel.updateBitmap(newBitmap)
                         }
                        navController.navigate(Routes.IMAGEPREVIEWSCREEN)
                     }
@@ -113,9 +113,10 @@ fun takePhoto(
 
                 val bitmap = image.toBitmap()
 
-                Handler(Looper.getMainLooper()).post {
-                    onPhotoTaken(bitmap)
-                }
+                onPhotoTaken(bitmap)
+//                Handler(Looper.getMainLooper()).post {
+//                    onPhotoTaken(bitmap)
+//                }
             }
 
             override fun onError(exception: ImageCaptureException) {

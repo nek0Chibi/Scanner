@@ -1,4 +1,4 @@
-package com.example.scanner.Screens.CameraComposable
+package com.example.scanner.screens.camera_composables
 
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image

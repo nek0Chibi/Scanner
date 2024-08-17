@@ -5,10 +5,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.scanner.Screens.CameraComposable.CameraScreen
-import com.example.scanner.Screens.CameraComposable.ImagePreview
-import com.example.scanner.Screens.MainScreen
-import com.example.scanner.Screens.WelcomeScreen
+import com.example.scanner.screens.camera_composables.CameraScreen
+import com.example.scanner.screens.camera_composables.ImagePreview
+import com.example.scanner.screens.MainScreen
+import com.example.scanner.screens.WelcomeScreen
 
 
 @Composable

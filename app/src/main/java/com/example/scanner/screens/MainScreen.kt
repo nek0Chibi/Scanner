@@ -1,4 +1,4 @@
-package com.example.scanner.Screens
+package com.example.scanner.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -62,7 +62,7 @@ fun MainScreen(navController: NavController) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(it)
-                .clip(RoundedCornerShape(topStart = 36.dp, topEnd = 36.dp))
+                .clip(RoundedCornerShape(topStart = 36.dp, topEnd = 36f.dp))
                 .background(Color.Gray),
         ) {
             LazyVerticalGrid(
