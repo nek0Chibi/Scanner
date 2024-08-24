@@ -1,25 +1,30 @@
 package com.example.scanner.screens.camera_composables
 
+import android.content.Context
 import android.graphics.Bitmap
-import android.os.Handler
-import android.os.Looper
+import android.graphics.Matrix
 import android.util.Log
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture.OnImageCapturedCallback
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.ImageProxy
+import androidx.camera.core.impl.utils.MatrixExt.postRotate
 import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Cameraswitch
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material.icons.outlined.PhotoCamera
+import androidx.compose.material.icons.outlined.SpaceBar
+import androidx.compose.material.icons.outlined.Videocam
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -29,21 +34,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import com.example.scanner.MainViewModel
 import com.example.scanner.Routes
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
 
 @Composable
-fun CameraUI(navController: NavController, viewModel: MainViewModel = hiltViewModel()) {
+fun CameraUI(navController: NavController, viewModel: MainViewModel) {
 
     val context = LocalContext.current
     val controller = remember {
         LifecycleCameraController(context).apply {
             setEnabledUseCases(
-                CameraController.IMAGE_CAPTURE
+                CameraController.IMAGE_CAPTURE,
             )
         }
     }
@@ -61,7 +64,10 @@ fun CameraUI(navController: NavController, viewModel: MainViewModel = hiltViewMo
             IconButton(
                 onClick = {
                     controller.cameraSelector =
-                        if (controller.cameraSelector == CameraSelector.DEFAULT_BACK_CAMERA) CameraSelector.DEFAULT_FRONT_CAMERA else CameraSelector.DEFAULT_BACK_CAMERA
+                        if (controller.cameraSelector == CameraSelector.DEFAULT_BACK_CAMERA)
+                            CameraSelector.DEFAULT_FRONT_CAMERA
+                        else
+                            CameraSelector.DEFAULT_BACK_CAMERA
                 },
                 modifier = Modifier
                     .align(Alignment.TopStart)
@@ -78,21 +84,22 @@ fun CameraUI(navController: NavController, viewModel: MainViewModel = hiltViewMo
             ) {
                 IconButton(
                     onClick = {
-
+                        navController.navigate(Routes.GALLERYSCREEN)
                     }
                 ) {
                     Icon(Icons.Outlined.Image, "Gallery")
                 }
                 IconButton(
                     onClick = {
-                        takePhoto(controller) { newBitmap ->
-                            viewModel.updateBitmap(newBitmap)
+                        takePhoto(context, controller) { newBitmap ->
+                            viewModel.updateBitmapList(newBitmap)
+                            navController.navigate(Routes.IMAGEPREVIEWSCREEN)
                         }
-                       navController.navigate(Routes.IMAGEPREVIEWSCREEN)
                     }
                 ) {
                     Icon(Icons.Outlined.PhotoCamera, "Capture Photo")
                 }
+                Spacer(Modifier.size(16.dp))
 
             }
         }
@@ -100,23 +107,23 @@ fun CameraUI(navController: NavController, viewModel: MainViewModel = hiltViewMo
 }
 
 fun takePhoto(
+    context: Context,
     controller: LifecycleCameraController,
     onPhotoTaken: (Bitmap) -> Unit
 ) {
-    val backgroundExecutor: ExecutorService = Executors.newSingleThreadExecutor()
-
     controller.takePicture(
-        backgroundExecutor,
+        ContextCompat.getMainExecutor(context),
         object : OnImageCapturedCallback() {
             override fun onCaptureSuccess(image: ImageProxy) {
                 super.onCaptureSuccess(image)
 
                 val bitmap = image.toBitmap()
+                val rotationDegrees = image.imageInfo.rotationDegrees
+                val rotatedBitmap = bitmap.rotate(rotationDegrees.toFloat())
 
-                onPhotoTaken(bitmap)
-//                Handler(Looper.getMainLooper()).post {
-//                    onPhotoTaken(bitmap)
-//                }
+                onPhotoTaken(rotatedBitmap)
+
+                image.close()
             }
 
             override fun onError(exception: ImageCaptureException) {
@@ -125,5 +132,9 @@ fun takePhoto(
             }
         }
     )
+}
 
+fun Bitmap.rotate(degrees: Float): Bitmap {
+    val matrix = Matrix().apply { postRotate(degrees) }
+    return Bitmap.createBitmap(this, 0, 0, width, height, matrix, true)
 }

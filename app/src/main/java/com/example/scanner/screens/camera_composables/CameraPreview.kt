@@ -16,6 +16,7 @@ fun CameraPreview(
     AndroidView(
         factory = {
             PreviewView(it).apply {
+                this.bitmap
                 this.controller = controller
                 controller.bindToLifecycle(lifecycleOwner)
             }

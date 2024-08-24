@@ -136,7 +136,7 @@ enum class MenuItems(
     val route: String
 ) {
     Camera(icon = Icons.Outlined.CameraAlt, title = "Camera",route = Routes.CAMERASCREEN),
-    Gallery(icon = Icons.Outlined.Image, title = "Gallery",route = Routes.CAMERASCREEN),
+    Gallery(icon = Icons.Outlined.Image, title = "Gallery",route = Routes.GALLERYSCREEN),
     SavedFiles(icon = Icons.Outlined.Folder, title = "Saved Files",route = Routes.CAMERASCREEN),
     History(icon = Icons.Outlined.History, title = "History",route = Routes.CAMERASCREEN)
 

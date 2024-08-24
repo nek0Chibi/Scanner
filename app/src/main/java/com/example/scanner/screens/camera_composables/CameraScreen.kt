@@ -12,7 +12,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun CameraScreen(navController: NavController) {
+fun CameraScreen(navController: NavController, viewModel: MainViewModel) {
 
     val context = LocalContext.current
     
@@ -25,7 +25,7 @@ fun CameraScreen(navController: NavController) {
     }
 
     if (permissionState.hasPermission) {
-        CameraUI(navController)
+        CameraUI(navController, viewModel)
     } else {
         LaunchedEffect(permissionState.permissionRequested) {
             if (permissionState.permissionRequested && !permissionState.hasPermission) {
