@@ -1,18 +1,23 @@
 package com.example.scanner.screens.camera_composables
 
 import android.Manifest
+import android.graphics.Bitmap
 import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import com.example.scanner.MainViewModel
+import com.example.scanner.NavigationUiEvent
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun CameraScreen(navController: NavController, viewModel: MainViewModel) {
+fun CameraScreen(
+    onCaptureImage: (Bitmap) -> Unit,
+    onNavigate: (NavigationUiEvent) -> Unit,
+) {
 
     val context = LocalContext.current
     
@@ -25,12 +30,12 @@ fun CameraScreen(navController: NavController, viewModel: MainViewModel) {
     }
 
     if (permissionState.hasPermission) {
-        CameraUI(navController, viewModel)
+        CameraUI(onCaptureImage, onNavigate)
     } else {
         LaunchedEffect(permissionState.permissionRequested) {
             if (permissionState.permissionRequested && !permissionState.hasPermission) {
                 Toast.makeText(context, "Permission denied", Toast.LENGTH_SHORT).show()
-                navController.navigateUp()
+                onNavigate(NavigationUiEvent.NavigateBack)
             }
         }
     }

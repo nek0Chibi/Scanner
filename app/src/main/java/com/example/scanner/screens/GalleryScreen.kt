@@ -14,6 +14,7 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,8 +31,9 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -45,32 +47,35 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.scanner.MainUiEvent
 import com.example.scanner.MainViewModel
+import com.example.scanner.NavigationUiEvent
 import com.example.scanner.Routes
 
 @Composable
 fun GalleryScreen(
     bitmaps: List<Bitmap>,
-    navController: NavController,
-    viewModel: MainViewModel
+    onImagePicked: (Bitmap) -> Unit,
+    onNavigate: (NavigationUiEvent) -> Unit
 ) {
-
     val context = LocalContext.current
-    val pickImageLauncher = pickImageFromGallery(context, navController, viewModel)
+    val pickImageLauncher = pickImageFromGallery(context, onImagePicked)
 
-    if(bitmaps.isEmpty()) {
+    if (bitmaps.isEmpty()) {
         Column(
-            modifier = Modifier.fillMaxSize().padding(16.dp),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text("There are no photos here yet")
             Spacer(modifier = Modifier.height(8.dp))
             TextButton(
                 onClick = {
                     pickImageLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-
-                }
+                },
             ) {
                 Text("Import from Gallery")
             }
@@ -81,33 +86,53 @@ fun GalleryScreen(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = PaddingValues(16.dp),
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
         ) {
             item {
-                IconButton(
+                ElevatedCard(
                     onClick = {
-                        pickImageLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-                    }
+                        pickImageLauncher.launch(
+                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                        )
+                    },
+                    elevation = CardDefaults.elevatedCardElevation(4.dp),
+                    modifier =
+                        Modifier
+                            .aspectRatio(1f)
+                            .padding(16.dp),
                 ) {
-                    Icon(Icons.Default.Add, contentDescription = "Add Image")
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
+                    ) {
+                        Icon(Icons.Default.Add, contentDescription = "Add Image")
+                    }
+                }
+                Column(
+                    modifier =
+                        Modifier
+                            .aspectRatio(1f)
+                            .border(1.dp, Color.Cyan, RoundedCornerShape(10.dp))
+                            .background(Color.Gray),
+                ) {
                 }
             }
             items(bitmaps) { bitmap ->
                 Box(
-                    modifier = Modifier
-                        .aspectRatio(1f) // Maintain a square aspect ratio
-                        .clip(RoundedCornerShape(10.dp))
-                        .clickable {
-                            viewModel.updateCurrentBitmap(bitmap)
-                            navController.navigate(Routes.IMAGEPREVIEWSCREEN)
-                        }
-                        .background(Color.Gray)
+                    modifier =
+                        Modifier
+                            .aspectRatio(1f) // Maintain a square aspect ratio
+                            .clip(RoundedCornerShape(10.dp))
+                            .clickable {
+                                onNavigate(NavigationUiEvent.NavigateToImagePreviewScreen(bitmap))
+                            }.background(Color.Gray),
                 ) {
                     Image(
                         bitmap = bitmap.asImageBitmap(),
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier.fillMaxSize(),
                     )
                 }
             }
@@ -118,36 +143,34 @@ fun GalleryScreen(
 @Composable
 fun pickImageFromGallery(
     context: Context,
-    navController: NavController,
-    viewModel: MainViewModel
-): ManagedActivityResultLauncher<PickVisualMediaRequest, Uri?> {
-    return rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+    onImagePicked: (Bitmap) -> Unit
+): ManagedActivityResultLauncher<PickVisualMediaRequest, Uri?> =
+    rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         uri?.let {
             val flag = Intent.FLAG_GRANT_READ_URI_PERMISSION
             context.contentResolver.takePersistableUriPermission(uri, flag)
 
             val bitmap = uriToBitmap(context, it)?.asImageBitmap()
             bitmap?.let { newBitmap ->
-                viewModel.updateBitmapList(newBitmap.asAndroidBitmap())
+                onImagePicked(newBitmap.asAndroidBitmap())
             }
         }
     }
-}
 
-fun uriToBitmap(context: Context, uri: Uri): Bitmap? {
-    // Obtain the content resolver from the context
+fun uriToBitmap(
+    context: Context,
+    uri: Uri,
+): Bitmap? {
     val contentResolver: ContentResolver = context.contentResolver
 
-    // Check the API level to use the appropriate method for decoding the Bitmap
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-        // For Android P (API level 28) and higher, use ImageDecoder to decode the Bitmap
         val source = ImageDecoder.createSource(contentResolver, uri)
         ImageDecoder.decodeBitmap(source)
     } else {
-        // For versions prior to Android P, use BitmapFactory to decode the Bitmap
-        val bitmap = context.contentResolver.openInputStream(uri)?.use { stream ->
-            Bitmap.createBitmap(BitmapFactory.decodeStream(stream))
-        }
+        val bitmap =
+            context.contentResolver.openInputStream(uri)?.use { stream ->
+                Bitmap.createBitmap(BitmapFactory.decodeStream(stream))
+            }
         bitmap
     }
 }

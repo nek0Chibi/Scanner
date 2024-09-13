@@ -40,37 +40,36 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.scanner.Routes
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(navController: NavController) {
-
-    Scaffold (
+    Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text(text = "Scanner App") },
                 navigationIcon = {
                     Icon(Icons.TwoTone.Menu, contentDescription = "Menu")
                 },
-                modifier = Modifier
-                    .padding(top = 16.dp, bottom = 24.dp, start = 8.dp, end = 8.dp),
+                modifier =
+                    Modifier
+                        .padding(top = 16.dp, bottom = 24.dp, start = 8.dp, end = 8.dp),
             )
-        }
+        },
     ) {
-
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(it)
-                .clip(RoundedCornerShape(topStart = 36.dp, topEnd = 36f.dp))
-                .background(Color.Gray),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(it)
+                    .clip(RoundedCornerShape(topStart = 36.dp, topEnd = 36f.dp))
+                    .background(Color.Gray),
         ) {
             LazyVerticalGrid(
                 columns = GridCells.Adaptive(128.dp),
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
             ) {
                 items(MenuItems.entries) { menuItem ->
                     GridItem(icon = menuItem.icon, title = menuItem.title) {
@@ -82,62 +81,62 @@ fun MainScreen(navController: NavController) {
     }
 }
 
-
 @Composable
-fun GridItem(icon: ImageVector, title: String, onClickMenuItem: () -> Unit) {
+fun GridItem(
+    icon: ImageVector,
+    title: String,
+    onClickMenuItem: () -> Unit,
+) {
     ElevatedCard(
         onClick = onClickMenuItem,
         elevation = CardDefaults.elevatedCardElevation(4.dp),
-        modifier = Modifier
-            .aspectRatio(1f)
-            .padding(16.dp),
+        modifier =
+            Modifier
+                .aspectRatio(1f)
+                .padding(16.dp),
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically)
+            verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
         ) {
             FilledIcon(icon = icon, fillColor = Color.Cyan)
             Text(text = title)
         }
     }
 }
+
 @Composable
 fun FilledIcon(
     icon: ImageVector,
-    fillColor: Color
+    fillColor: Color,
 ) {
     Surface(
         shape = CircleShape,
-        color = fillColor
+        color = fillColor,
     ) {
         Box(
             modifier = Modifier.minimumInteractiveComponentSize(),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
-            Icon(icon,null)
+            Icon(icon, null)
         }
     }
 }
 
-
 @Preview
 @Composable
 fun ScreenPreview() {
-
     MainScreen(navController = rememberNavController())
-
 }
-
 
 enum class MenuItems(
     val icon: ImageVector,
     val title: String,
-    val route: String
+    val route: String,
 ) {
-    Camera(icon = Icons.Outlined.CameraAlt, title = "Camera",route = Routes.CAMERASCREEN),
-    Gallery(icon = Icons.Outlined.Image, title = "Gallery",route = Routes.GALLERYSCREEN),
-    SavedFiles(icon = Icons.Outlined.Folder, title = "Saved Files",route = Routes.CAMERASCREEN),
-    History(icon = Icons.Outlined.History, title = "History",route = Routes.CAMERASCREEN)
-
+    Camera(icon = Icons.Outlined.CameraAlt, title = "Camera", route = Routes.CAMERASCREEN),
+    Gallery(icon = Icons.Outlined.Image, title = "Gallery", route = Routes.GALLERYSCREEN),
+    ScanPdf(icon = Icons.Outlined.Folder, title = "Scan PDF", route = Routes.CAMERASCREEN),
+    History(icon = Icons.Outlined.History, title = "History", route = Routes.CAMERASCREEN),
 }
